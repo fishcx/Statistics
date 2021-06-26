@@ -1,0 +1,275 @@
+<script>
+	$(document).ready(function() {
+    
+    $('.changeItem').change(function(){
+        $('#generate').click();
+    });
+
+    $(document).keypress(function (e) {
+        var key = e.which;
+         if(key == 13)  // the enter key code
+         {
+            $('#generate').click();
+             return false;  
+          }
+    });
+    
+    $('#video-button').hide();
+    
+    var testing = false;
+    $('#generate').click(function(){
+        if(!testing){$("#answer").hide(); $("#show-answer").val("Show Answer");}
+        generate(parseInt($("#type").val()));       
+     });
+
+
+    $("#show-answer").click(function(){
+       if($("#answer").is(":hidden") ){
+          $("#answer").show();
+          $("#show-answer").val("Hide Answer");
+       } else{
+         $("#answer").hide();
+         $("#show-answer").val("Show Answer");
+        }
+    });
+    
+    if(testing){ $("#answer").show();}
+
+	});
+	function generate(type){
+       
+       var videoLinks = ["https://www.youtube.com/watch?v=icsp994SSH0",
+                         "https://www.youtube.com/watch?v=lCmJ2kFr3-s",
+                         "https://www.youtube.com/watch?v=lXmMJawCY18"];
+       
+       if(videoLinks[type-1].length != 0){ 
+         $("#videoLink"). attr("href", videoLinks[type-1]);
+         $('#video-button').show();
+       }
+       else{
+         $('#video-button').hide();
+       }
+       
+       
+       var problem = "";
+       var answer = "";
+       var a,b,c,d,e,f,g,h;
+       $("#generated").html("");
+       $("#answer").html("");
+       
+       switch(type) {
+           // Mean,Median,Mode,Range
+           case 1:
+           var data = randomData();
+           problem = "\\("+data.prob+"\\)";
+           answer = "<b>Mean</b> = "+data.mean.toFixed(2)+", <b>Median</b> = "+data.med+", <b>Mode</b> = "+data.md+", <b>Range</b> = "+(data.max-data.min)+"<br>Mean rounded to the nearest hundredth.";
+           break;
+           
+           // Mean and MAD
+           case 2:
+           a = 0; // total
+           var nums = new Array();
+           for(var i = 0; i < 10; i++){
+           
+              nums[i] = random(1,10);
+              a += nums[i];
+           }
+           
+           b = Math.round((a+0.000000000001))/10; // mean
+           c = 0; //difference from the mean sum
+           for(var i = 0; i < 10; i++){
+           
+              c += Math.abs(nums[i]-b);
+           
+           }
+           d = Math.round(((c/10)+0.000000000001)*1000000)/1000000; // MAD
+           problem = "\\("+nums.toString()+"\\)";
+           answer = "<b>Mean</b> = "+b+", <b>MAD</b> = "+d;
+           break;
+		  
+           // Min,Q1,Median,Q3,Max
+           case 3:   
+           var data = randomData();
+           problem = "\\("+data.prob+"\\)";
+           answer = "<b>Min</b>= "+data.min+", <b>Q1</b> = "+data.quartile1+", <b>Median</b> = "+data.med+", <b>Q3</b> = "+data.quartile3+", <b>Max</b> = "+data.max;
+           answer += "<br><b>IQR</b> = Q3-Q1 = "+(data.quartile3-data.quartile1);
+           break;
+
+       }
+            
+       $("#generated").html(problem);
+       $("#answer").html(doublesigns(answer));
+       renderMathInElement(document.body);
+       //MathJax.Hub.queue.Push(["Typeset",MathJax.Hub,"generated"]);
+       //MathJax.Hub.queue.Push(["Typeset",MathJax.Hub,"answer"]);
+	}
+	
+    // size needs to be more than 3
+    function randomDataSize(size){
+           
+           var nums = [];
+           var orderedVals = [];  
+           var numarray = [];  
+           var min = random(0,5);
+           var max = min+size+5; // allows for plenty of options
+           var modeAmount = random(2,5);
+           
+           // create a blank array that will count how many of each number
+           for(var i = min; i <= max; i++){ numarray[i] = 0 ; }
+           
+           var sum = 0; var found = false; var mode = -1; var newNum;
+           for(var i = 0; i < size; i++){
+                 
+                 found = false;
+                 while(!found){
+                    
+                    // if mode is not set yet, set the mode
+                    if(mode == -1){
+                    
+                       newNum = random(min,max);  // creates a new value that will be the mode
+                       mode = newNum;             // set the mode
+                       numarray[newNum] = modeAmount;  // counts it many times
+                       sum += (newNum*modeAmount);
+                       
+                       for(var j = 0; j < modeAmount; j++){
+                          
+                          nums[i+j] = newNum;
+                          
+                       }
+                       i = i+modeAmount-1;        // skip ahead in for loop
+                       found = true;              // break while loop
+                    }
+                    
+                    else{
+                       newNum = random(min,max);  // creates a new value that will be NOT be the same as the mode
+                       
+                       // if the new value is not the mode and there isn't already two of them, then create it as the new number
+                       if((newNum != mode) && (numarray[newNum] < (modeAmount-1))){                       
+                         
+                         nums[i] = newNum;
+                         numarray[nums[i]]++; // increase the number of that data value
+                         sum += nums[i];
+                         found = true;
+                         
+                       }
+                    
+                    }
+                 }
+
+           }
+           
+           var average = Math.round(100*sum/size)/100; //mean rounded to the nearest hundredth
+           
+           var count = 0;
+           //sort the data into a sorted array
+           for (var i = min; i <= max; i++) {
+   
+             if(numarray[i]!=0){
+               for(var j = 0; j < numarray[i]; j++){
+                  count++;
+                  orderedVals[count]=i;
+                  
+                }
+              }
+
+            }
+           var median, q1, q3, half, quarter;
+           // even number of values
+           if((size % 2) == 0){
+              
+              half = size/2;
+              median = (orderedVals[half]+orderedVals[half+1])/2;
+              if((half % 2) == 0){
+
+                 quarter = half/2;
+                 q1 = (orderedVals[quarter]+orderedVals[quarter+1])/2;
+                 q3 = (orderedVals[quarter+half]+orderedVals[quarter+half+1])/2;
+              
+              } else{
+                 
+                 quarter = Math.floor(half/2)+1;
+                 q1 = orderedVals[quarter];
+                 q3 = orderedVals[quarter+half];
+              
+              }
+           } 
+           // odd number of values
+           else{
+              
+              half = Math.floor(size/2);
+              median = orderedVals[half+1];
+              
+              if((half % 2) == 0){
+
+                 quarter = half/2;
+                 q1 = (orderedVals[quarter]+orderedVals[quarter+1])/2;
+                 q3 = (orderedVals[quarter+half+1]+orderedVals[quarter+half+2])/2;
+              
+              } else{
+                 
+                 quarter = Math.floor(half/2)+1;
+                 q1 = orderedVals[quarter];
+                 q3 = orderedVals[quarter+half+1];
+              
+              }
+           }
+      
+       return {prob:shuffle(nums).toString(), min:orderedVals[1],quartile1:q1, med:median, quartile3:q3,max:orderedVals[size],mean:average, md:mode};
+     
+    }
+    
+    function randomData(){
+       
+       var size = random(7,15); // determines the size of the list of numbers
+       return randomDataSize(size);
+       
+    }
+       
+    // removes all double signs
+    function doublesigns(string){
+       return string.replaceAll("-+", "-").replaceAll("- +", "-").replaceAll("+ -", "-").replaceAll("- -", "+").replaceAll("+-", "-").replaceAll("-- ", "+");
+    }
+    
+    String.prototype.replaceAll = function(searchStr, replaceStr) {
+	   var str = this;
+       // no match exists in string?
+       if(str.indexOf(searchStr) === -1) {
+          // return string
+          return str;
+       }
+      // replace and remove first match, and do another recursirve search/replace
+       return (str.replace(searchStr, replaceStr)).replaceAll(searchStr, replaceStr);
+    }
+    
+    // random integer between and including min and max
+	function random(min, max) {
+         return Math.floor(Math.random() * (max - min + 1) ) + min;
+    } 
+    
+    // random non-zero integer bewteen min and max
+    function non_zero_random(min, max) {
+         var output;
+         do{output = Math.floor(Math.random() * (max - min + 1) ) + min;} while (output === 0);  
+         return output;
+    } 
+    
+    function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
+</script>
