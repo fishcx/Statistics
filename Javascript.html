@@ -62,7 +62,7 @@
            case 1:
            var data = randomData();
            problem = "\\("+data.prob+"\\)";
-           answer = "<b>Mean</b> = "+data.mean.toFixed(2)+", <b>Median</b> = "+data.med+", <b>Mode</b> = "+data.md+", <b>Range</b> = "+(data.max-data.min)+"<br>Mean rounded to the nearest hundredth.";
+           answer = "<b>Mean</b> = "+data.mean.toFixed(2)+", <b>Median</b> = "+data.med+", <b>Mode</b> = "+data.md+"<br>Mean rounded to the nearest hundredth.";
            break;
            
            // Mean and MAD
@@ -92,7 +92,7 @@
            var data = randomData();
            problem = "\\("+data.prob+"\\)";
            answer = "<b>Min</b>= "+data.min+", <b>Q1</b> = "+data.quartile1+", <b>Median</b> = "+data.med+", <b>Q3</b> = "+data.quartile3+", <b>Max</b> = "+data.max;
-           answer += "<br><b>IQR</b> = Q3-Q1 = "+(data.quartile3-data.quartile1);
+           answer += "<br><b>IQR</b> = Q3-Q1 = "+(data.quartile3-data.quartile1)+", <b>Range</b>="+(data.max-data.min);
            break;
 
        }
