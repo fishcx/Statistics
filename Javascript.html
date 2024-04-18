@@ -39,8 +39,8 @@
 	function generate(type){
        
        var videoLinks = ["https://www.youtube.com/watch?v=icsp994SSH0",
-                         "https://www.youtube.com/watch?v=lCmJ2kFr3-s",
-                         "https://www.youtube.com/watch?v=lXmMJawCY18"];
+                         "https://www.youtube.com/watch?v=lXmMJawCY18",
+                         ""];
        
        if(videoLinks[type-1].length != 0){ 
          $("#videoLink"). attr("href", videoLinks[type-1]);
@@ -64,44 +64,26 @@
            problem = "\\("+data.prob+"\\)";
            answer = "<b>Mean</b> = "+data.mean.toFixed(2)+", <b>Median</b> = "+data.med+", <b>Mode</b> = "+data.md+"<br>Mean rounded to the nearest hundredth.";
            break;
-           
-           // Mean and MAD
-           case 2:
-           a = 0; // total
-           var nums = new Array();
-           for(var i = 0; i < 10; i++){
-           
-              nums[i] = random(1,10);
-              a += nums[i];
-           }
-           
-           b = Math.round((a+0.000000000001))/10; // mean
-           c = 0; //difference from the mean sum
-           for(var i = 0; i < 10; i++){
-           
-              c += Math.abs(nums[i]-b);
-           
-           }
-           d = Math.round(((c/10)+0.000000000001)*1000000)/1000000; // MAD
-           problem = "\\("+nums.toString()+"\\)";
-           answer = "<b>Mean</b> = "+b+", <b>MAD</b> = "+d;
-           break;
 		  
            // Min,Q1,Median,Q3,Max
-           case 3:   
+           case 2:   
            var data = randomData();
            problem = "\\("+data.prob+"\\)";
            answer = "<b>Min</b>= "+data.min+", <b>Q1</b> = "+data.quartile1+", <b>Median</b> = "+data.med+", <b>Q3</b> = "+data.quartile3+", <b>Max</b> = "+data.max;
            answer += "<br><b>IQR</b> = Q3-Q1 = "+(data.quartile3-data.quartile1)+", <b>Range</b>="+(data.max-data.min);
            break;
 
+          // Sample Standard Deviation
+          case 3:
+          var data = randomData();
+          problem = "\\("+data.prob+"\\)";
+          answer = "<b>Sample standard deviation</b> = "+data.sSD.toFixed(2)+" (rounded to nearest hundredth)";
+          break;
        }
             
        $("#generated").html(problem);
        $("#answer").html(doublesigns(answer));
        renderMathInElement(document.body);
-       //MathJax.Hub.queue.Push(["Typeset",MathJax.Hub,"generated"]);
-       //MathJax.Hub.queue.Push(["Typeset",MathJax.Hub,"answer"]);
 	}
 	
     // size needs to be more than 3
@@ -110,9 +92,10 @@
            var nums = [];
            var orderedVals = [];  
            var numarray = [];  
-           var min = random(0,5);
-           var max = min+size+5; // allows for plenty of options
-           var modeAmount = random(2,5);
+           var min = random(0,20);
+           var max = 50; // allows for plenty of options
+           var top = Math.floor(size/2);
+           var modeAmount = random(2,top);
            
            // create a blank array that will count how many of each number
            for(var i = min; i <= max; i++){ numarray[i] = 0 ; }
@@ -213,14 +196,36 @@
               
               }
            }
-      
-       return {prob:shuffle(nums).toString(), min:orderedVals[1],quartile1:q1, med:median, quartile3:q3,max:orderedVals[size],mean:average, md:mode};
+      var sd = calcSampleSD(average,nums);
+       return {prob:shuffle(nums).toString(), min:orderedVals[1],quartile1:q1, med:median, quartile3:q3,max:orderedVals[size],mean:average, md:mode, sSD:sd};
      
     }
     
+    // helper function to calculate the sample standard deviation
+    function calcSampleSD(mean,values){
+
+        var total = 0;
+        for(var i = 0; i < values.length; i++){
+
+          total += Math.pow(values[i]-mean,2);
+
+        }
+
+        return formatDec(Math.round(100*Math.sqrt(total/(values.length-1)))/100); 
+
+    }
+
+    // use this for complicated calculations to format the decimal correctly for floating point errors
+   function formatDec(a){
+   
+     return Math.round(a*100000)/100000;
+   
+   }
+
+
     function randomData(){
        
-       var size = random(7,15); // determines the size of the list of numbers
+       var size = random(7,20); // determines the size of the list of numbers
        return randomDataSize(size);
        
     }
