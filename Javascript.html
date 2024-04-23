@@ -40,7 +40,8 @@
        
        var videoLinks = ["https://www.youtube.com/watch?v=icsp994SSH0",
                          "https://www.youtube.com/watch?v=lXmMJawCY18",
-                         "https://www.youtube.com/watch?v=YF3Z0IsRXCs"];
+                         "https://www.youtube.com/watch?v=YF3Z0IsRXCs",
+                         ""];
        
        if(videoLinks[type-1].length != 0){ 
          $("#videoLink"). attr("href", videoLinks[type-1]);
@@ -79,13 +80,165 @@
           problem = "\\("+data.prob+"\\)";
           answer = "<b>Sample standard deviation</b> = "+data.sSD.toFixed(2)+" (rounded to nearest hundredth)";
           break;
+
+          // Two-way tables
+          case 4:
+          var tableMaker;
+          switch(random(0,1)){
+            case 0 : tableMaker = twoWay2Columns(); break;
+            case 1: tableMaker = twoWay3Columns(); break;
+          }
+          problem = tableMaker.table+"<br>"+tableMaker.problem;
+          answer = tableMaker.answer;
+          break;
        }
             
        $("#generated").html(problem);
        $("#answer").html(doublesigns(answer));
        renderMathInElement(document.body);
 	}
-	
+
+    // function to create a two-way table
+    function twoWay3Columns(){
+       
+       var topLabels = ["","Soda","Water","No Drink","Total"];
+       var sideLabels = ["","Hot Dog","Pizza","No Food"];
+       var firstData = [random(10,60),random(10,80),random(10,80)];
+       var firstTotal = firstData[0]+firstData[1]+firstData[2];
+
+       var secondData = [random(10,60),random(10,80),random(10,80)];
+       var secondTotal = secondData[0]+secondData[1]+secondData[2];
+
+       var thirdData = [random(10,60),random(10,80),random(10,80)];
+       var thirdTotal = thirdData[0]+thirdData[1]+thirdData[2];
+      
+       var tableData = [];
+       tableData.push(topLabels);
+       tableData.push([sideLabels[1],firstData[0],firstData[1],firstData[2],firstTotal]);
+       tableData.push([sideLabels[2],secondData[0],secondData[1],secondData[2],secondTotal]);
+       tableData.push([sideLabels[3],thirdData[0],thirdData[1],thirdData[2],thirdTotal]);
+       tableData.push(["Total",firstData[0]+secondData[0]+thirdData[0],firstData[1]+secondData[1]+thirdData[1],firstData[2]+secondData[2]+thirdData[2],firstTotal+secondTotal+thirdTotal]);
+
+       var output = "<table border='1'>";
+
+       for(var j = 0; j < tableData.length; j++){
+
+         output += "<tr>";
+         for(var i = 0; i < tableData[j].length; i++){
+            output += "<td>"+tableData[j][i]+"</td>";
+        }
+         output += "</tr>";
+
+       }
+       output += "</table>";
+       
+       var quest = generateQuestion(tableData,3,3,firstTotal+secondTotal+thirdTotal);
+      
+       return {table:output,problem:quest.prob,answer:quest.ans};
+         
+    }
+
+    // function to get question from table
+    function generateQuestion(data,numColumns,numRows,totalTotal){
+      
+      var generatedProblem = "What percent of ";
+      var generatedAnswer = "";
+      var rowNum = random(1,numRows);
+      var colNum = random(1,numColumns);
+     // alert("Row: "+rowNum+", Column:"+colNum);
+      switch(random(0,4)){
+         // joint / total total
+         case 0:
+         generatedProblem += "all surveyed chose "+data[0][colNum]+" and "+data[rowNum][0]+"?";
+         generatedAnswer = fracToPercent(data[rowNum][colNum],totalTotal);
+         //generatedAnswer = "\\(\\frac{"+data[rowNum][colNum]+"}{"+totalTotal+"}\\approx"+formatDec(Math.round(data[rowNum][colNum]/totalTotal*1000)/10)+"\\%\\)";
+         break;
+
+         // joint / total of row
+         case 1:
+         generatedProblem += "all those who chose "+data[rowNum][0]+" also chose "+data[0][colNum]+"?";
+         generatedAnswer = fracToPercent(data[rowNum][colNum],data[rowNum][numColumns+1]);
+         //generatedAnswer = "\\(\\frac{"+data[rowNum][colNum]+"}{"+data[rowNum][numColumns+1]+"}\\approx"+formatDec(Math.round(data[rowNum][colNum]/data[rowNum][numColumns+1]*1000)/10)+"\\%\\)";
+         break;
+
+         // joint / total of column
+         case 2:
+         generatedProblem += "all those who chose "+data[0][colNum]+" also chose "+data[rowNum][0]+"?";
+         generatedAnswer = fracToPercent(data[rowNum][colNum],data[numRows+1][colNum]);
+         //generatedAnswer = "\\(\\frac{"+data[rowNum][colNum]+"}{"+data[numRows+1][colNum]+"}\\approx"+formatDec(Math.round(data[rowNum][colNum]/data[numRows+1][colNum]*1000)/10)+"\\%\\)";
+         break;
+
+         // total of row / total total
+         case 3:
+         generatedProblem += "all surveyed chose "+data[rowNum][0]+"?";
+         generatedAnswer = fracToPercent(data[rowNum][numColumns+1],totalTotal);
+         //generatedAnswer = "\\(\\frac{"+data[rowNum][numColumns+1]+"}{"+totalTotal+"}\\approx"+formatDec(Math.round(data[rowNum][numColumns+1]/totalTotal*1000)/10)+"\\%\\)";
+         break;
+         
+         // total of column / total total 
+         case 4:
+         generatedProblem += "all surveyed chose "+data[0][colNum]+"?";
+         generatedAnswer = fracToPercent(data[numRows+1][colNum],totalTotal);
+         //generatedAnswer = "\\(\\frac{"++"}{"+totalTotal+"}\\approx"+formatDec(Math.round(data[numRows+1][colNum]/totalTotal*1000)/10)+"\\%\\)";
+         break;
+       }
+
+       return {prob: generatedProblem, ans: generatedAnswer};
+
+    }
+
+    // function to format percents
+    function fracToPercent(num,denom){
+
+      var output = "\\(\\frac{"+num+"}{"+denom+"}";
+      if(formatDec(num/denom*100) == formatDec(Math.round(num/denom*1000)/10)){
+        output +="=";
+      }
+      else{
+        output += "\\approx";
+      }
+      output +=formatDec(Math.round(num/denom*1000)/10)+"\\%\\)";
+
+      return output;
+    }
+
+
+    // function to create a two-way table
+    function twoWay2Columns(){
+       
+       var topLabels = ["","Watch Sports","Don't Watch Sports","Total"];
+       var sideLabels = ["","Like Pop Music","Don't Like Pop Music"];
+       var firstData = [random(10,60),random(10,80)];
+       var firstTotal = firstData[0]+firstData[1];
+
+       var secondData = [random(10,60),random(10,80)];
+       var secondTotal = secondData[0]+secondData[1];
+      
+       var tableData = [];
+       tableData.push(topLabels);
+       tableData.push([sideLabels[1],firstData[0],firstData[1],firstTotal]);
+       tableData.push([sideLabels[2],secondData[0],secondData[1],secondTotal]);
+       tableData.push(["Total",firstData[0]+secondData[0],firstData[1]+secondData[1],firstTotal+secondTotal]);
+
+       var output = "<table border='1'>";
+
+       for(var j = 0; j < tableData.length; j++){
+
+         output += "<tr>";
+         for(var i = 0; i < tableData[j].length; i++){
+            output += "<td>"+tableData[j][i]+"</td>";
+        }
+         output += "</tr>";
+
+       }
+       output += "</table>";
+       
+      var quest = generateQuestion(tableData,2,2,firstTotal+secondTotal);
+      
+       return {table:output,problem:quest.prob,answer:quest.ans};
+         
+    }
+
     // size needs to be more than 3
     function randomDataSize(size){
            
