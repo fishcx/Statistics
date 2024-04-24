@@ -101,8 +101,13 @@
     // function to create a two-way table
     function twoWay3Columns(){
        
-       var topLabels = ["","Soda","Water","No Drink","Total"];
-       var sideLabels = ["","Hot Dog","Pizza","No Food"];
+       var topLabelOptions = [["","Soda","Water","No Drink","Total"],
+                               ["","Soccer","Lacrosse","Softball","Total"] ];
+       var sideLabelOptions = [["","Hot Dog","Pizza","No Food"],
+                               ["","6th Grade","7th Grade","8th grade"]];
+       var typeSelector = random(0,topLabelOptions.length-1);
+       var topLabels = topLabelOptions[typeSelector];
+       var sideLabels = sideLabelOptions[typeSelector];
        var firstData = [random(10,60),random(10,80),random(10,80)];
        var firstTotal = firstData[0]+firstData[1]+firstData[2];
 
@@ -151,35 +156,30 @@
          case 0:
          generatedProblem += "all surveyed chose "+data[0][colNum]+" and "+data[rowNum][0]+"?";
          generatedAnswer = fracToPercent(data[rowNum][colNum],totalTotal);
-         //generatedAnswer = "\\(\\frac{"+data[rowNum][colNum]+"}{"+totalTotal+"}\\approx"+formatDec(Math.round(data[rowNum][colNum]/totalTotal*1000)/10)+"\\%\\)";
          break;
 
          // joint / total of row
          case 1:
          generatedProblem += "all those who chose "+data[rowNum][0]+" also chose "+data[0][colNum]+"?";
          generatedAnswer = fracToPercent(data[rowNum][colNum],data[rowNum][numColumns+1]);
-         //generatedAnswer = "\\(\\frac{"+data[rowNum][colNum]+"}{"+data[rowNum][numColumns+1]+"}\\approx"+formatDec(Math.round(data[rowNum][colNum]/data[rowNum][numColumns+1]*1000)/10)+"\\%\\)";
          break;
 
          // joint / total of column
          case 2:
          generatedProblem += "all those who chose "+data[0][colNum]+" also chose "+data[rowNum][0]+"?";
          generatedAnswer = fracToPercent(data[rowNum][colNum],data[numRows+1][colNum]);
-         //generatedAnswer = "\\(\\frac{"+data[rowNum][colNum]+"}{"+data[numRows+1][colNum]+"}\\approx"+formatDec(Math.round(data[rowNum][colNum]/data[numRows+1][colNum]*1000)/10)+"\\%\\)";
          break;
 
          // total of row / total total
          case 3:
          generatedProblem += "all surveyed chose "+data[rowNum][0]+"?";
          generatedAnswer = fracToPercent(data[rowNum][numColumns+1],totalTotal);
-         //generatedAnswer = "\\(\\frac{"+data[rowNum][numColumns+1]+"}{"+totalTotal+"}\\approx"+formatDec(Math.round(data[rowNum][numColumns+1]/totalTotal*1000)/10)+"\\%\\)";
          break;
          
          // total of column / total total 
          case 4:
          generatedProblem += "all surveyed chose "+data[0][colNum]+"?";
          generatedAnswer = fracToPercent(data[numRows+1][colNum],totalTotal);
-         //generatedAnswer = "\\(\\frac{"++"}{"+totalTotal+"}\\approx"+formatDec(Math.round(data[numRows+1][colNum]/totalTotal*1000)/10)+"\\%\\)";
          break;
        }
 
@@ -206,8 +206,21 @@
     // function to create a two-way table
     function twoWay2Columns(){
        
-       var topLabels = ["","Watch Sports","Don't Watch Sports","Total"];
-       var sideLabels = ["","Like Pop Music","Don't Like Pop Music"];
+       var topLabelOptions = [["","Watch Sports","Play Sports","Total"],
+                              ["","Summer","Winter","Total"],
+                              ["","Rock Music","Country Music","Total"],
+                              ["","7th grade","8th grade","Total"]
+                              ];
+       var sideLabelOptions = [["","Pop Music","Rap Music"],
+                                ["","Cats","Dogs"],
+                                ["","Video games","Reading"],
+                                ["","Band","Chorus"]
+                              ];
+      
+       var typeSelector = random(0,topLabelOptions.length-1);
+       var topLabels = topLabelOptions[typeSelector];
+       var sideLabels = sideLabelOptions[typeSelector];
+
        var firstData = [random(10,60),random(10,80)];
        var firstTotal = firstData[0]+firstData[1];
 
